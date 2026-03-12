@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vamp project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- =====================================================
+         ГЛАВНОЕ МЕНЮ — отображается при загрузке страницы.
+         Кнопка сложности открывает экран выбора сложности.
+         Кнопка "Начать игру" вызывает startGame() в script.js.
+    ====================================================== -->
+    <div id="menu" class="menu">
+        <h1>Главное меню</h1>
+        <button id="start-button">Начать игру</button>
+        <button id="difficulty-button">Сложность: Нормально</button>
+        <button id="exit-button">Выход</button>
+    </div>
+
+    <!-- =====================================================
+         ЭКРАН ВЫБОРА СЛОЖНОСТИ — появляется, когда игрок
+         нажимает кнопку "Сложность" в главном меню.
+    ====================================================== -->
+    <div id="difficulty-screen" class="menu" style="display:none;">
+        <h1>Сложность</h1>
+        <button id="diff-easy">Легко</button>
+        <button id="diff-normal">Нормально</button>
+        <button id="diff-hard">Сложно</button>
+        <button id="diff-back">Назад</button>
+    </div>
+
+    <!-- =====================================================
+         МЕНЮ ПАУЗЫ — появляется когда игра поставлена
+         на паузу (обычно по нажатию клавиши Esc).
+    ====================================================== -->
+    <div id="pause-menu" class="menu" style="display:none;">
+        <h1>Пауза</h1>
+        <button id="resume-button">Продолжить</button>
+        <button id="pause-exit-button">Выход в меню</button>
+    </div>
+
+    <!-- =====================================================
+         ИГРОВОЙ КОНТЕЙНЕР — основная игровая область,
+         где появляются игрок, враги и пули.
+    ====================================================== -->
+    <div id="game-container"></div>
+
+    <!-- =====================================================
+         HUD (интерфейс игрока) — отображает информацию
+         во время игры: патроны, волну и количество убийств.
+    ====================================================== -->
+    <div id="ammo-indicator" style="display:none;">Патроны: 999/999</div>
+    <div id="wave-indicator" style="display:none;">Волна: 1</div>
+    <div id="kill-counter"   style="display:none;">Убито: 0</div>
+    <div id="wave-announce"  style="display:none;"></div>
+
+    <!-- =====================================================
+         ЭКРАН КОНЦА ИГРЫ — появляется когда здоровье
+         игрока падает до нуля.
+    ====================================================== -->
+    <div id="game-over-message" style="display:none;">
+        <div id="game-over-text">Игра закончена!</div>
+        <button id="restart-button">Главное меню</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+/* ============================================================
+   GLOBAL RESET & BODY
+   Центрирует всё на экране и убирает стандартные отступы.
+   overflow:hidden предотвращает появление полос прокрутки,
+   когда враги появляются на самом краю окна.
+============================================================ */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ============================================================
+   MENU CARD
+   Общий стиль для главного меню, экрана выбора сложности
+   и меню паузы. Все три используют одну и ту же карточку;
+   JavaScript просто переключает какая из них видима.
+============================================================ */
+.menu {
+    position: absolute;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 50px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    z-index: 200; /* находится поверх игры и HUD */
+}
+
+.menu h1 {
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+/* ============================================================
+   BUTTONS
+   Используются везде: в меню, экране паузы и экране
+   окончания игры.
+============================================================ */
+button {
+    padding: 15px;
+    margin: 10px;
+    font-size: 1.2em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 220px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* ============================================================
+   GAME CONTAINER
+   Игровая область на весь экран. Скрыта пока игра
+   не начнётся. Все игровые объекты (игрок, враги,
+   пули) позиционируются абсолютно внутри этого div.
+============================================================ */
+.game-container {
+    width: 100%;
+    height: 100%;
+    background-color: #2d2d2d;
+    position: fixed;
+    display: none;
+}
+
+/* ============================================================
+   PLAYER
+   Синий квадрат размером 20×20. Оружие и полоска здоровья
+   являются дочерними элементами, поэтому двигаются вместе
+   с игроком автоматически.
+============================================================ */
+.player {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: blue;
+    z-index: 2;
+}
+
+/* Красная точка внутри игрока, которая поворачивается
+   в сторону врагов */
+.gun {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    transition: all 0.1s ease-in-out;
+}
+
+/* ============================================================
+   HEALTH BAR
+   Располагается чуть ниже игрока или врага, которому
+   принадлежит. Ширина изменяется в JS в зависимости
+   от текущего процента HP.
+============================================================ */
+.health-bar {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: green;
+    transition: width 0.1s linear;
+}
+
+/* ============================================================
+   ENEMY
+   Тёмно-красный квадрат 20×20. Появляется на случайном
+   краю экрана и каждый кадр движется к игроку.
+============================================================ */
+.enemy {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: darkred;
+    z-index: 1;
+}
+
+/* ============================================================
+   BULLET
+   Маленький чёрный квадрат 5×5, который стреляет
+   в ближайшего врага. Удаляется из DOM когда
+   вылетает за экран или попадает во врага.
+============================================================ */
+.bullet {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background-color: black;
+    z-index: 3;
+}
+
+/* ============================================================
+   HUD ELEMENTS
+   Небольшие информационные панели в углах экрана.
+   Появляются только во время активной игры (включаются JS).
+============================================================ */
+
+/* Правый верх: оставшиеся патроны */
+#ammo-indicator {
+    font-size: 18px;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    z-index: 50;
+    border-radius: 5px;
+}
+
+/* Левый верх: текущая волна */
+#wave-indicator {
+    font-size: 18px;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 50;
+    border-radius: 5px;
+}
+
+/* Верх по центру: общее количество убийств */
+#kill-counter {
+    font-size: 18px;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    left: 50%;
+    top: 10px;
+    transform: translateX(-50%);
+    z-index: 50;
+    border-radius: 5px;
+    min-width: 120px;
+}
+
+/* ============================================================
+   WAVE ANNOUNCEMENT BANNER
+   Ненадолго появляется в центре экрана в начале
+   каждой волны. pointer-events:none позволяет
+   кликам проходить сквозь баннер.
+============================================================ */
+#wave-announce {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 20px 40px;
+    border-radius: 10px;
+    z-index: 60;
+    pointer-events: none;
+    text-align: center;
+    white-space: pre-line; /* учитывает \n в тексте */
+}
+
+/* ============================================================
+   GAME-OVER SCREEN
+   Центрированное окно, которое появляется когда
+   HP игрока достигает нуля. Показывает статистику
+   и кнопку возврата в главное меню.
+============================================================ */
+#game-over-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    padding: 30px;
+    text-align: center;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    border-radius: 10px;
+    gap: 15px;
+    white-space: pre-line;
+}
+
+#game-over-text {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1.6;
+}
