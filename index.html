@@ -1,22 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>vamp project</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vampire Survivors Clone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/ui.css" />
+  <link rel="stylesheet" href="css/effects.css" />
 </head>
 <body>
-     <!-- Меню -->
-    <div id="menu" class="menu">
-        <h1>Главное меню</h1>
-        <button id="start-button">Начать игру</button>
-        <button id="settings-button">Настройки</button>
-        <button id="exit-button">Выход</button>
+
+  <!-- MAIN MENU -->
+  <div id="mainMenu" class="screen active">
+    <div class="menu-bg"></div>
+    <div class="menu-particles" id="menuParticles"></div>
+    <div class="menu-content">
+      <div class="title-wrapper">
+        <div class="title-glow">VAMPIRE</div>
+        <div class="title-main">SURVIVORS</div>
+        <div class="title-sub">— REBORN —</div>
+      </div>
+      <div class="menu-buttons">
+        <button class="btn-menu" id="btnStart">▶ НАЧАТЬ ИГРУ</button>
+        <button class="btn-menu" id="btnHow">? КАК ИГРАТЬ</button>
+      </div>
+      <div class="menu-footer">Выживи как можно дольше против орд нежити</div>
     </div>
-    <!--Игровой контейнер-->>
-<div id="game-container"></div>
-<div id="ammo-indicator">Патроны: 10</div>
-<div id="game-over-message" style="display:none;">Игра закончена!</div>
-<script src="script.js"></script>
+  </div>
+
+  <!-- HOW TO PLAY -->
+  <div id="howToPlay" class="screen">
+    <div class="menu-bg"></div>
+    <div class="how-content">
+      <h2 class="how-title">КАК ИГРАТЬ</h2>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-icon">🎮</div>
+          <div class="how-text"><strong>WASD / Стрелки</strong><br/>Передвижение персонажа</div>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">⚔️</div>
+          <div class="how-text"><strong>Авто-атака</strong><br/>Оружие стреляет автоматически по ближайшим врагам</div>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">💎</div>
+          <div class="how-text"><strong>Опыт</strong><br/>Собирай кристаллы с убитых врагов для повышения уровня</div>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">📈</div>
+          <div class="how-text"><strong>Прокачка</strong><br/>Каждый уровень — выбор нового оружия или улучшения</div>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">❤️</div>
+          <div class="how-text"><strong>Здоровье</strong><br/>Враги наносят урон при касании. Не давай окружить себя!</div>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">⏱️</div>
+          <div class="how-text"><strong>Цель</strong><br/>Выживи 15 минут или набери максимум очков</div>
+        </div>
+      </div>
+      <button class="btn-menu" id="btnBackMenu">← НАЗАД</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="screen">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div id="hudLeft">
+        <div class="hud-label">HP</div>
+        <div id="hpBarWrapper">
+          <div id="hpBar"></div>
+          <span id="hpText">100/100</span>
+        </div>
+      </div>
+      <div id="hudCenter">
+        <div id="timerDisplay">00:00</div>
+        <div id="scoreDisplay">0</div>
+      </div>
+      <div id="hudRight">
+        <div class="hud-label">УРОВЕНЬ <span id="levelDisplay">1</span></div>
+        <div id="xpBarWrapper">
+          <div id="xpBar"></div>
+        </div>
+        <div id="killCount">☠ 0</div>
+      </div>
+    </div>
+
+    <!-- WEAPONS HUD -->
+    <div id="weaponsHud"></div>
+  </div>
+
+  <!-- LEVEL UP SCREEN -->
+  <div id="levelUpScreen" class="screen">
+    <div class="levelup-overlay"></div>
+    <div class="levelup-panel">
+      <div class="levelup-title">✨ УРОВЕНЬ <span id="newLevel">2</span> ✨</div>
+      <div class="levelup-subtitle">Выбери улучшение</div>
+      <div id="levelUpChoices" class="choices-grid"></div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOverScreen" class="screen">
+    <div class="menu-bg"></div>
+    <div class="gameover-content">
+      <div class="gameover-title" id="gameOverTitle">GAME OVER</div>
+      <div class="gameover-stats">
+        <div class="stat-row"><span>Время выживания</span><span id="finalTime">00:00</span></div>
+        <div class="stat-row"><span>Убито врагов</span><span id="finalKills">0</span></div>
+        <div class="stat-row"><span>Достигнутый уровень</span><span id="finalLevel">1</span></div>
+        <div class="stat-row"><span>Очки</span><span id="finalScore">0</span></div>
+      </div>
+      <div class="gameover-buttons">
+        <button class="btn-menu" id="btnRestart">↺ ИГРАТЬ СНОВА</button>
+        <button class="btn-menu secondary" id="btnMainMenu">⌂ ГЛАВНОЕ МЕНЮ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSE -->
+  <div id="pauseScreen" class="screen">
+    <div class="pause-panel">
+      <div class="pause-title">⏸ ПАУЗА</div>
+      <button class="btn-menu" id="btnResume">▶ ПРОДОЛЖИТЬ</button>
+      <button class="btn-menu secondary" id="btnPauseMenu">⌂ МЕНЮ</button>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/weapons.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>
