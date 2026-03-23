@@ -1,3 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>vamp project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+     <!-- Меню -->
+    <div id="menu" class="menu">
+        <h1>Главное меню</h1>
+        <button id="start-button">Начать игру</button>
+        <button id="settings-button">Настройки</button>
+        <button id="exit-button">Выход</button>
+    </div>
+    <!--Игровой контейнер-->>
+<div id="game-container"></div>
+<div id="ammo-indicator">Патроны: 10</div>
+<div id="game-over-message" style="display:none;">Игра закончена!</div>
+<script src="script.js"></script>
+</body>
+</html>
+=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,11 +81,13 @@
 
     <!-- Подключаем скрипты в правильном порядке -->
     <script src="js/config/config.js"></script>
+    <script src="js/audio/sound.js"></script>
     <script src="js/state/state.js"></script>
     <script src="js/ui/ui.js"></script>
     <script src="js/core/hero.js"></script>
     <script src="js/state/ai.js"></script>
     <script src="js/core/waves.js"></script>
+    <script src="js/canvas/canvas.js"></script>
     <script src="js/core/qa.js"></script>
     <script src="js/core/core.js"></script>
     
@@ -78,3 +104,4 @@
     </script>
 </body>
 </html>
+
