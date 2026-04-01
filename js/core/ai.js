@@ -223,12 +223,38 @@ function updateEnemies() {
     }
     return false;
 }
+// Функция для рисования скелета
+window.drawSkeleton = function(ctx, x, y) {
+    // Белый круг с чёрными глазницами
+    ctx.fillStyle = '#f0f0f0';
+    ctx.beginPath();
+    ctx.arc(x, y, 10, 0, Math.PI * 2);
+    ctx.fill();
     
+    // Глазницы
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(x - 4, y - 3, 2, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x + 4, y - 3, 2, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Рот (линия)
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x - 5, y + 3);
+    ctx.lineTo(x + 5, y + 3);
+    ctx.stroke();
+}
     return {
         createEnemy: createEnemy,
         shootAtNearestEnemy: shootAtNearestEnemy,
         moveBullets: moveBullets,
-        updateEnemies: updateEnemies
+        updateEnemies: updateEnemies,
+        drawSkeleton: window.drawSkeleton
     };
 })();
 
