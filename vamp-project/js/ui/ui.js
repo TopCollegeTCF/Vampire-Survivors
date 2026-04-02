@@ -3,274 +3,357 @@
 // ui.js - Управление интерфейсом
 // ============================================================
 
-var GameUI = (function() {
-    // DOM элементы
-    var elements = {};
+const GameUI = (() => {
+    const ids = {
+        menu: 'menu',
+        difficultyScreen: 'difficulty-screen',
+        pauseMenu: 'pause-menu',
+        gameContainer: 'game-container',
+
+        startButton: 'start-button',
+        difficultyButton: 'difficulty-button',
+        exitButton: 'exit-button',
+
+        diffEasy: 'diff-easy',
+        diffNormal: 'diff-normal',
+        diffHard: 'diff-hard',
+        diffBack: 'diff-back',
+
+        resumeButton: 'resume-button',
+        pauseExitButton: 'pause-exit-button',
+
+        ammoIndicator: 'ammo-indicator',
+        waveIndicator: 'wave-indicator',
+        killCounter: 'kill-counter',
+        waveAnnounce: 'wave-announce',
+
+        gameOverMessage: 'game-over-message',
+        gameOverText: 'game-over-text',
+        restartButton: 'restart-button',
+
+        playerHpWrap: 'player-healthbar-wrap',
+        playerHpFill: 'player-healthbar-fill',
+        playerHpValue: 'player-hp-value',
+
+        soundToggle: 'sound-toggle'
+    };
+
+    const requiredElements = [
+        'menu',
+        'startButton',
+        'difficultyButton',
+        'exitButton',
+        'gameContainer'
+    ];
+
+    const elements = {};
+    let waveAnnounceTimer = null;
+
+    const displayMap = {
+        menu: 'flex',
+        difficultyScreen: 'flex',
+        pauseMenu: 'flex',
+        gameContainer: 'block',
+        ammoIndicator: 'block',
+        waveIndicator: 'block',
+        killCounter: 'block',
+        waveAnnounce: 'block',
+        gameOverMessage: 'flex',
+        playerHpWrap: 'flex',
+        soundToggle: 'block'
+    };
 
     function init() {
-        console.log('GameUI.init() начат');
-        
-        // Проверяем, что document существует
-        if (!document) {
-            console.error('document не доступен!');
-            return;
+        console.log('[UI] init');
+
+        if (typeof document === 'undefined') {
+            console.error('[UI] document не доступен');
+            return false;
         }
 
-        // Получаем элементы с проверкой
-        elements.menu = document.getElementById('menu');
-        elements.difficultyScreen = document.getElementById('difficulty-screen');
-        elements.pauseMenu = document.getElementById('pause-menu');
-        elements.gameContainer = document.getElementById('game-container');
-        
-        elements.startButton = document.getElementById('start-button');
-        elements.difficultyButton = document.getElementById('difficulty-button');
-        elements.exitButton = document.getElementById('exit-button');
-        
-        elements.diffEasy = document.getElementById('diff-easy');
-        elements.diffNormal = document.getElementById('diff-normal');
-        elements.diffHard = document.getElementById('diff-hard');
-        elements.diffBack = document.getElementById('diff-back');
-        
-        elements.resumeButton = document.getElementById('resume-button');
-        elements.pauseExitButton = document.getElementById('pause-exit-button');
-        
-        elements.ammoIndicator = document.getElementById('ammo-indicator');
-        elements.waveIndicator = document.getElementById('wave-indicator');
-        elements.killCounter = document.getElementById('kill-counter');
-        elements.waveAnnounce = document.getElementById('wave-announce');
-        elements.gameOverMessage = document.getElementById('game-over-message');
-        elements.restartButton = document.getElementById('restart-button');
-        
-        elements.playerHpWrap = document.getElementById('player-healthbar-wrap');
-        elements.playerHpFill = document.getElementById('player-healthbar-fill');
-        elements.playerHpValue = document.getElementById('player-hp-value');
+        cacheElements();
 
-        // Проверяем каждый критический элемент
-        var missingElements = [];
-        if (!elements.menu) missingElements.push('menu');
-        if (!elements.startButton) missingElements.push('start-button');
-        if (!elements.difficultyButton) missingElements.push('difficulty-button');
-        if (!elements.exitButton) missingElements.push('exit-button');
-        if (!elements.gameContainer) missingElements.push('game-container');
-
-        if (missingElements.length > 0) {
-            console.error('Не найдены элементы DOM:', missingElements.join(', '));
-            console.log('Текущее состояние document.readyState:', document.readyState);
-            return;
+        if (!validateElements()) {
+            return false;
         }
 
-        console.log('Все элементы DOM найдены, настраиваем слушатели...');
-        setupMenuListeners();
-        setupDifficultyListeners();
-        setupPauseListeners();
-        console.log('GameUI.init() завершен успешно');
+        bindEvents();
+        console.log('[UI] init завершён');
+        return true;
     }
 
-    function setupMenuListeners() {
-        elements.startButton.onclick = function() {
-            elements.menu.style.display = 'none';
+    function cacheElements() {
+        Object.keys(ids).forEach(key => {
+            elements[key] = document.getElementById(ids[key]);
+        });
+    }
+
+    function validateElements() {
+        const missing = requiredElements.filter(key => !elements[key]);
+
+        if (missing.length > 0) {
+            console.error(
+                '[UI] Не найдены элементы:',
+                missing.map(key => ids[key]).join(', ')
+            );
+            console.log('[UI] document.readyState:', document.readyState);
+            return false;
+        }
+
+        return true;
+    }
+
+    function bindEvents() {
+        bindMenuEvents();
+        bindDifficultyEvents();
+        bindPauseEvents();
+    }
+
+    function bindMenuEvents() {
+        on('startButton', 'click', () => {
+            hide('menu');
             GameCore.startGame();
-        };
-        
-        elements.difficultyButton.onclick = function() {
-            elements.menu.style.display = 'none';
-            elements.difficultyScreen.style.display = 'flex';
-        };
-        
-        elements.exitButton.onclick = function() { 
-            location.reload(); 
-        };
+        });
+
+        on('difficultyButton', 'click', () => {
+            hide('menu');
+            show('difficultyScreen');
+        });
+
+        on('exitButton', 'click', reloadPage);
     }
 
-    function setupDifficultyListeners() {
-        elements.diffEasy.onclick = function() { 
-            setDifficultyUI('easy'); 
-        };
-        elements.diffNormal.onclick = function() { 
-            setDifficultyUI('normal'); 
-        };
-        elements.diffHard.onclick = function() { 
-            setDifficultyUI('hard'); 
-        };
-        elements.diffBack.onclick = function() {
-            elements.difficultyScreen.style.display = 'none';
-            elements.menu.style.display = 'flex';
-        };
+    function bindDifficultyEvents() {
+        on('diffEasy', 'click', () => setDifficultyUI('easy'));
+        on('diffNormal', 'click', () => setDifficultyUI('normal'));
+        on('diffHard', 'click', () => setDifficultyUI('hard'));
+
+        on('diffBack', 'click', () => {
+            hide('difficultyScreen');
+            show('menu');
+        });
+    }
+
+    function bindPauseEvents() {
+        on('resumeButton', 'click', GameCore.resumeGame);
+        on('pauseExitButton', 'click', reloadPage);
+        on('restartButton', 'click', reloadPage);
     }
 
     function setDifficultyUI(level) {
+        const labels = {
+            easy: 'Легко',
+            normal: 'Нормально',
+            hard: 'Сложно'
+        };
+
         GameConfig.setDifficulty(level);
-        var labels = { easy: 'Легко', normal: 'Нормально', hard: 'Сложно' };
-        elements.difficultyButton.textContent = 'Сложность: ' + labels[level];
-        elements.difficultyScreen.style.display = 'none';
-        elements.menu.style.display = 'flex';
+        setText('difficultyButton', `Сложность: ${labels[level]}`);
+        hide('difficultyScreen');
+        show('menu');
     }
-
-    function setupPauseListeners() {
-        elements.resumeButton.onclick = GameCore.resumeGame;
-        elements.pauseExitButton.onclick = function() { 
-            location.reload(); 
-        };
-        elements.restartButton.onclick = function() { 
-            location.reload(); 
-        };
-    }
-
 
     function initCanvas() {
-    console.log('[UI] initCanvas вызван');
-    if (typeof GameCanvas !== 'undefined' && GameCanvas.init) {
-        GameCanvas.init();
-        GameCanvas.startRenderLoop();
-        console.log('[UI] Canvas инициализирован');
-    } else {
-        console.error('[UI] GameCanvas не найден');
+        console.log('[UI] initCanvas');
+
+        if (typeof GameCanvas !== 'undefined' && typeof GameCanvas.init === 'function') {
+            GameCanvas.init();
+
+            if (typeof GameCanvas.startRenderLoop === 'function') {
+                GameCanvas.startRenderLoop();
+            }
+
+            console.log('[UI] Canvas инициализирован');
+        } else {
+            console.error('[UI] GameCanvas не найден');
+        }
     }
-}
 
     function createPlayer() {
         if (!elements.gameContainer) {
-            console.error('gameContainer не найден при создании игрока');
+            console.error('[UI] gameContainer не найден при создании игрока');
             return;
         }
-        
-        var playerDiv = document.createElement('div');
-        playerDiv.className = 'player';
-        playerDiv.style.left = GameState.player().x + 'px';
-        playerDiv.style.top = GameState.player().y + 'px';
 
-        var healthBar = document.createElement('div');
-        healthBar.className = 'health-bar';
-        healthBar.style.width = '100%';
-        playerDiv.appendChild(healthBar);
+        const player = GameState.player();
 
-        var playerGun = document.createElement('div');
-        playerGun.className = 'gun';
-        playerDiv.appendChild(playerGun);
+        const playerEl = createDiv('player', {
+            left: `${player.x}px`,
+            top: `${player.y}px`
+        });
 
-        elements.gameContainer.appendChild(playerDiv);
-        
-        GameState.setPlayerElement(playerDiv, playerGun);
+        const healthBarEl = createDiv('health-bar', {
+            width: '100%'
+        });
+
+        const gunEl = createDiv('gun');
+
+        playerEl.appendChild(healthBarEl);
+        playerEl.appendChild(gunEl);
+
+        elements.gameContainer.appendChild(playerEl);
+        GameState.setPlayerElement(playerEl, gunEl);
     }
 
-    function createEnemyElement(x, y, health, maxHealth) {
+    function createEnemyElement(x, y) {
         if (!elements.gameContainer) return null;
-        
-        var enemyDiv = document.createElement('div');
-        enemyDiv.className = 'enemy';
-        enemyDiv.style.left = x + 'px';
-        enemyDiv.style.top = y + 'px';
-        elements.gameContainer.appendChild(enemyDiv);
 
-        var bar = document.createElement('div');
-        bar.className = 'health-bar';
-        bar.style.width = '100%';
-        enemyDiv.appendChild(bar);
-        
-        return { element: enemyDiv, bar: bar };
+        const enemyEl = createDiv('enemy', {
+            left: `${x}px`,
+            top: `${y}px`
+        });
+
+        const healthBarEl = createDiv('health-bar', {
+            width: '100%'
+        });
+
+        enemyEl.appendChild(healthBarEl);
+        elements.gameContainer.appendChild(enemyEl);
+
+        return {
+            element: enemyEl,
+            bar: healthBarEl
+        };
     }
 
     function createBulletElement(x, y) {
         if (!elements.gameContainer) return null;
-        
-        var bulletEl = document.createElement('div');
-        bulletEl.className = 'bullet';
-        bulletEl.style.left = x + 'px';
-        bulletEl.style.top = y + 'px';
+
+        const bulletEl = createDiv('bullet', {
+            left: `${x}px`,
+            top: `${y}px`
+        });
+
         elements.gameContainer.appendChild(bulletEl);
         return bulletEl;
     }
 
     function updateAmmo() {
-        if (elements.ammoIndicator) {
-            elements.ammoIndicator.textContent = 'Патроны: ' + GameState.ammoCount() + '/999';
-        }
+        setText('ammoIndicator', `Патроны: ${GameState.ammoCount()}/infinity`);
     }
 
     function updateWave() {
-        if (elements.waveIndicator) {
-            elements.waveIndicator.textContent = 'Волна: ' + GameState.waveNumber();
-        }
+        setText('waveIndicator', `Волна: ${GameState.waveNumber()}`);
     }
 
     function updateKills() {
-        if (elements.killCounter) {
-            elements.killCounter.textContent = 'Убито: ' + GameState.totalKills();
-        }
+        setText('killCounter', `Убито: ${GameState.totalKills()}`);
     }
 
     function updateHealth() {
         if (!elements.playerHpFill || !elements.playerHpValue) return;
-        
-        var pct = Math.max(0, GameState.player().health);
-        elements.playerHpFill.style.width = pct + '%';
-        elements.playerHpValue.textContent = Math.ceil(pct);
-        
-        if (pct > 60) elements.playerHpFill.style.backgroundColor = '#2ecc40';
-        else if (pct > 30) elements.playerHpFill.style.backgroundColor = '#ffdc00';
-        else elements.playerHpFill.style.backgroundColor = '#ff4136';
+
+        const hp = Math.max(0, Math.min(100, GameState.player().health));
+
+        elements.playerHpFill.style.width = `${hp}%`;
+        elements.playerHpValue.textContent = Math.ceil(hp);
+
+        if (hp > 60) {
+            elements.playerHpFill.style.backgroundColor = '#2ecc40';
+        } else if (hp > 30) {
+            elements.playerHpFill.style.backgroundColor = '#ffdc00';
+        } else {
+            elements.playerHpFill.style.backgroundColor = '#ff4136';
+        }
     }
 
     function showWaveAnnounce(text) {
         if (!elements.waveAnnounce) return;
-        
-        elements.waveAnnounce.textContent = text;
-        elements.waveAnnounce.style.display = 'block';
-        
-        setTimeout(function() {
-            if (elements.waveAnnounce) {
-                elements.waveAnnounce.style.display = 'none';
-            }
+
+        setText('waveAnnounce', text);
+        show('waveAnnounce');
+
+        clearTimeout(waveAnnounceTimer);
+        waveAnnounceTimer = setTimeout(() => {
+            hide('waveAnnounce');
         }, GameConfig.GAME_PARAMS.WAVE_ANNOUNCE_DURATION);
     }
 
     function showGameOver() {
-        var gameOverText = document.getElementById('game-over-text');
-        if (gameOverText) {
-            gameOverText.textContent = 'Игра закончена!\nВолна: ' + GameState.waveNumber() + 
-                '\nУбито врагов: ' + GameState.totalKills();
-        }
-        if (elements.gameOverMessage) {
-            elements.gameOverMessage.style.display = 'flex';
-        }
+        setText(
+            'gameOverText',
+            `Игра закончена!\nВолна: ${GameState.waveNumber()}\nУбито врагов: ${GameState.totalKills()}`
+        );
+
+        show('gameOverMessage');
     }
 
     function showGameUI() {
+        console.log('[UI] showGameUI');
 
-    console.log('[UI] showGameUI вызван');
-    
-    if (elements.gameContainer) elements.gameContainer.style.display = 'block';
-    if (elements.ammoIndicator) elements.ammoIndicator.style.display = 'block';
-    if (elements.waveIndicator) elements.waveIndicator.style.display = 'block';
-    if (elements.killCounter) elements.killCounter.style.display = 'block';
-    if (elements.playerHpWrap) elements.playerHpWrap.style.display = 'flex';
-    if (elements.soundToggle) elements.soundToggle.style.display = 'block';
-    
-    initCanvas();
-}
+        hideAllMenus();
 
+        show('gameContainer');
+        show('ammoIndicator');
+        show('waveIndicator');
+        show('killCounter');
+        show('playerHpWrap');
+        show('soundToggle');
 
+        initCanvas();
+    }
 
     function hideAllMenus() {
-        if (elements.menu) elements.menu.style.display = 'none';
-        if (elements.difficultyScreen) elements.difficultyScreen.style.display = 'none';
-        if (elements.pauseMenu) elements.pauseMenu.style.display = 'none';
+        hide('menu');
+        hide('difficultyScreen');
+        hide('pauseMenu');
+        hide('gameOverMessage');
+    }
+
+    function show(name, display = displayMap[name] || 'block') {
+        if (elements[name]) {
+            elements[name].style.display = display;
+        }
+    }
+
+    function hide(name) {
+        if (elements[name]) {
+            elements[name].style.display = 'none';
+        }
+    }
+
+    function setText(name, value) {
+        if (elements[name]) {
+            elements[name].textContent = value;
+        }
+    }
+
+    function on(name, event, handler) {
+        if (elements[name]) {
+            elements[name].addEventListener(event, handler);
+        }
+    }
+
+    function reloadPage() {
+        location.reload();
+    }
+
+    function createDiv(className, styles = {}) {
+        const div = document.createElement('div');
+        div.className = className;
+        Object.assign(div.style, styles);
+        return div;
     }
 
     return {
-        init: init,
-        elements: elements,
-        createPlayer: createPlayer,
-        createEnemyElement: createEnemyElement,
-        createBulletElement: createBulletElement,
-        updateAmmo: updateAmmo,
-        updateWave: updateWave,
-        updateKills: updateKills,
-        updateHealth: updateHealth,
-        showWaveAnnounce: showWaveAnnounce,
-        showGameOver: showGameOver,
-        showGameUI: showGameUI,
-        hideAllMenus: hideAllMenus,
-        setupMenuListeners: setupMenuListeners
+        init,
+        elements,
+
+        createPlayer,
+        createEnemyElement,
+        createBulletElement,
+
+        updateAmmo,
+        updateWave,
+        updateKills,
+        updateHealth,
+
+        showWaveAnnounce,
+        showGameOver,
+        showGameUI,
+        hideAllMenus,
+
+        setDifficultyUI,
+        initCanvas
     };
 })();
