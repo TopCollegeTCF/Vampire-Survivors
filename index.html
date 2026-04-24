@@ -52,6 +52,7 @@
         </div>
     </div>
 
+<<<<<<< Updated upstream
     <!-- Опыт: уровень и полоска -->
     <div id="exp-bar-wrap" style="display:none;">
         <div class="hud-bar-block exp-hud">
@@ -82,5 +83,41 @@
     <script src="js/ui.js"></script>
     <script src="js/core/qa.js"></script>
     <!-- script.js — монолитная версия; не подключать вместе с модульным ядром выше -->
+=======
+    <!-- ===== SETTINGS (Конфигурации) ===== -->
+    <script src="js/settings/utils.js"></script>
+    <script src="js/settings/game-config.js"></script>
+    <script src="js/settings/weapons-config.js"></script>
+    <script src="js/settings/passives-config.js"></script>
+    
+    <!-- ===== GRAPHICS (Визуальная часть) ===== -->
+    <script src="js/graphics/canvas.js"></script>
+    <script src="js/graphics/particles.js"></script>
+    <script src="js/graphics/ui.js"></script>
+    
+    <!-- ===== GAME CORE (Базовые классы) ===== -->
+    <script src="js/game/weapons-core.js"></script>
+    <script src="js/game/weapons-system.js"></script>
+    <script src="js/game/player.js"></script>
+    <script src="js/game/enemies.js"></script>
+    <script src="js/game/world.js"></script>
+    
+    <!-- ===== GAME CLASS (Определение класса) ===== -->
+    <script src="js/game/game-core.js"></script>
+    
+    <!-- ===== GAME METHODS (Добавление в прототип) ===== -->
+    <script src="js/game/game-update.js"></script>
+    <script src="js/game/game-events.js"></script>
+    
+    <!-- ===== BOOT (Запуск) ===== -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            window.game = new Game();
+            console.log('%c🧛 VAMPIRE SURVIVORS CLONE LOADED', 'color:#c0152a;font-size:1.2em;font-weight:bold');
+            console.log('%cWASD / Arrow keys to move. Weapons fire automatically!', 'color:#e8b84b');
+            console.log('%cType window._debug=true to show debug info', 'color:#888');
+        });
+    </script>
+>>>>>>> Stashed changes
 </body>
 </html>
