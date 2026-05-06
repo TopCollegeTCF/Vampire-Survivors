@@ -8,7 +8,7 @@ const ASSETS = {
         playerGun: 'assets/images/player/player_gun.png',
         
         enemies: {
-            BAT: 'assets/images/enemies/enemy_bat.png',
+            BAT: 'assets/images/enemies/bat.png',
             SKELETON: 'assets/images/enemies/skeleton.png',
             ZOMBIE: 'assets/images/enemies/zombie.png',
             GHOST: 'assets/images/enemies/ghost.png',
